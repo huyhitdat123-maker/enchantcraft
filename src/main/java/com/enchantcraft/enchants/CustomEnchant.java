@@ -13,7 +13,13 @@ public class CustomEnchant {
         WEAPON("Vũ khí (Kiếm, Rìu, Chùy, Đinh Ba)"),
         BOW("Cung / Nỏ"),
         PICKAXE("Cuốc"),
-        ARMOR("Giáp"),
+        SHOVEL("Xẻng"),
+        TOOL("Công cụ (Cuốc, Rìu, Xẻng, Cuốc Chim)"),
+        HELMET("Mũ"),
+        CHESTPLATE("Áo Giáp"),
+        LEGGINGS("Quần"),
+        BOOTS("Giày"),
+        ARMOR("Tất cả Giáp"),
         ALL("Mọi trang bị");
 
         private final String label;
@@ -34,7 +40,13 @@ public class CustomEnchant {
                 case WEAPON -> name.endsWith("_SWORD") || name.endsWith("_AXE") || mat == Material.MACE || mat == Material.TRIDENT;
                 case BOW -> mat == Material.BOW || mat == Material.CROSSBOW;
                 case PICKAXE -> name.endsWith("_PICKAXE");
-                case ARMOR -> name.endsWith("_HELMET") || name.endsWith("_CHESTPLATE") || name.endsWith("_LEGGINGS") || name.endsWith("_BOOTS");
+                case SHOVEL -> name.endsWith("_SHOVEL");
+                case TOOL -> name.endsWith("_PICKAXE") || name.endsWith("_AXE") || name.endsWith("_SHOVEL") || name.endsWith("_HOE");
+                case HELMET -> name.endsWith("_HELMET") || mat == Material.TURTLE_HELMET;
+                case CHESTPLATE -> name.endsWith("_CHESTPLATE") || mat == Material.ELYTRA;
+                case LEGGINGS -> name.endsWith("_LEGGINGS");
+                case BOOTS -> name.endsWith("_BOOTS");
+                case ARMOR -> name.endsWith("_HELMET") || name.endsWith("_CHESTPLATE") || name.endsWith("_LEGGINGS") || name.endsWith("_BOOTS") || mat == Material.TURTLE_HELMET;
                 case ALL -> true;
             };
         }
@@ -44,7 +56,9 @@ public class CustomEnchant {
         ATTACK,
         DEFEND,
         MINE,
-        INTERACT
+        INTERACT,
+        SNEAK,
+        PASSIVE
     }
 
     private final String id;
