@@ -1,7 +1,17 @@
-# ============================================================
-# KHO PHÙ PHÉP ENCHANTCRAFT
-# Chỉnh sửa xong, lưu file và gõ /ec reload trong game!
-# ============================================================
+# ==============================================================================
+# KHO PHÙ PHÉP ENCHANTCRAFT (ALL-IN-ONE)
+# Sửa xong bấm Lưu (Save) trên hosting rồi vào game gõ: /ec reload
+# ==============================================================================
+# CÁC TỪ KHÓA HỖ TRỢ SẴN:
+# - target: SWORD, AXE, WEAPON, BOW, PICKAXE, SHOVEL, TOOL, HELMET, CHESTPLATE, LEGGINGS, BOOTS, ARMOR, ALL
+# - trigger: ATTACK (chém/bắn trúng), DEFEND (bị đánh), MINE (đào block), INTERACT (chuột phải), SNEAK (bấm Shift), PASSIVE (bị động mỗi 2s)
+# - actions:
+#   + Đào mỏ: MINE_3X3 | VEIN_MINE:<số_block> | AUTO_SMELT | MAGNET | EXP_BOOST:<số_exp>
+#   + Chiến đấu: HEAL:<máu> | LIFESTEAL:<tỉ_lệ_0.1_1.0> | DAMAGE:<sát_thương> | CLEAVE:<bán_kính>:<sát_thương>
+#   + Nguyên tố: LIGHTNING | LIGHTNING_EFFECT | EXPLODE:<độ_lớn> | IGNITE:<ticks> | FREEZE:<ticks> | ARROW_RAIN:<số_tên>
+#   + Di chuyển: DASH:<lực> | LEAP:<lực_tới>:<lực_nhảy> | LAUNCH:<lực_hất_tung> | PULL:<lực_kéo> | TELEPORT_HIT | FIREBALL
+#   + Hiệu ứng: POTION_SELF:<tên>:<cấp>:<ticks> | POTION_TARGET:<tên>:<cấp>:<ticks> | SOUND:<tên> | PARTICLE:<tên>:<số_lượng> | ACTIONBAR:<chữ>
+# ==============================================================================
 
 enchants:
   hut_mau:
@@ -22,6 +32,7 @@ enchants:
         B: BOOK
     actions:
       - "HEAL:2.0"
+      - "PARTICLE:HEART:5"
 
   loi_dinh:
     display_name: "Lôi Đình I"
@@ -42,3 +53,161 @@ enchants:
     actions:
       - "LIGHTNING_EFFECT"
       - "DAMAGE:4.0"
+
+  chem_lan:
+    display_name: "Chém Lan I"
+    target: WEAPON
+    description: "35% tỉ lệ quét kiếm gây 4 sát thương diện rộng 3.5 block"
+    trigger: ATTACK
+    chance: 0.35
+    cooldown: 1
+    recipe:
+      shape:
+        - "III"
+        - "IBI"
+        - "III"
+      ingredients:
+        I: IRON_BLOCK
+        B: BOOK
+    actions:
+      - "CLEAVE:3.5:4.0"
+      - "PARTICLE:SWEEP_ATTACK:3"
+
+  dao_3x3:
+    display_name: "Đào Hầm 3x3"
+    target: TOOL
+    description: "Đào phá diện rộng 3x3 ô cùng lúc"
+    trigger: MINE
+    chance: 1.0
+    cooldown: 0
+    recipe:
+      shape:
+        - "DPD"
+        - "PBP"
+        - "DPD"
+      ingredients:
+        D: DIAMOND_BLOCK
+        P: IRON_PICKAXE
+        B: BOOK
+    actions:
+      - "MINE_3X3"
+
+  dao_mach_quang:
+    display_name: "Thợ Mỏ Thần Tốc"
+    target: TOOL
+    description: "Đào cả mạch quặng hoặc chặt đổ cả thân cây (tối đa 16 khối)"
+    trigger: MINE
+    chance: 1.0
+    cooldown: 0
+    recipe:
+      shape:
+        - "EAE"
+        - "ABA"
+        - "EAE"
+      ingredients:
+        E: EMERALD_BLOCK
+        A: GOLDEN_APPLE
+        B: BOOK
+    actions:
+      - "VEIN_MINE:16"
+
+  nung_quang:
+    display_name: "Lò Nung Từ Trường"
+    target: PICKAXE
+    description: "Tự động nung chín quặng và hút thẳng vật phẩm vào túi đồ"
+    trigger: MINE
+    chance: 1.0
+    cooldown: 0
+    recipe:
+      shape:
+        - "BFB"
+        - "FKF"
+        - "BFB"
+      ingredients:
+        B: BLAZE_POWDER
+        F: BLAST_FURNACE
+        K: BOOK
+    actions:
+      - "AUTO_SMELT"
+      - "MAGNET"
+      - "EXP_BOOST:2"
+
+  luot_gio:
+    display_name: "Lướt Gió I"
+    target: BOOTS
+    description: "Bấm Shift khi đang mang giày để lướt vút về phía trước (hồi 3s)"
+    trigger: SNEAK
+    chance: 1.0
+    cooldown: 3
+    recipe:
+      shape:
+        - "FDF"
+        - "FBF"
+        - "FDF"
+      ingredients:
+        F: FEATHER
+        D: DIAMOND
+        B: BOOK
+    actions:
+      - "DASH:1.7"
+      - "SOUND:ENTITY_BREEZE_JUMP"
+      - "PARTICLE:CLOUD:12"
+      - "ACTIONBAR:&b⚡ Lướt Gió!"
+
+  gai_doc:
+    display_name: "Giáp Gai Độc I"
+    target: ARMOR
+    description: "30% tỉ lệ đầu độc và làm chậm kẻ tấn công bạn"
+    trigger: DEFEND
+    chance: 0.30
+    cooldown: 2
+    recipe:
+      shape:
+        - "PSP"
+        - "SBS"
+        - "PSP"
+      ingredients:
+        P: PUFFERFISH
+        S: SPIDER_EYE
+        B: BOOK
+    actions:
+      - "POTION_TARGET:poison:2:60"
+      - "POTION_TARGET:slowness:1:60"
+
+  cung_no:
+    display_name: "Tên Bùng Nổ I"
+    target: BOW
+    description: "35% tỉ lệ tạo vụ nổ không phá địa hình khi bắn trúng"
+    trigger: ATTACK
+    chance: 0.35
+    cooldown: 2
+    recipe:
+      shape:
+        - "TGT"
+        - "GBG"
+        - "TGT"
+      ingredients:
+        T: TNT
+        G: GUNPOWDER
+        B: BOOK
+    actions:
+      - "EXPLODE:2.0"
+
+  mat_than:
+    display_name: "Mắt Thần Đêm"
+    target: HELMET
+    description: "Nhìn rõ trong bóng tối vĩnh viễn khi đội mũ"
+    trigger: PASSIVE
+    chance: 1.0
+    cooldown: 0
+    recipe:
+      shape:
+        - "GCG"
+        - "CBC"
+        - "GCG"
+      ingredients:
+        G: GLOWSTONE
+        C: GOLDEN_CARROT
+        B: BOOK
+    actions:
+      - "POTION_SELF:night_vision:1:300"
