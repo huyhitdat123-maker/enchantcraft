@@ -1,0 +1,44 @@
+# ============================================================
+# KHO PHÙ PHÉP ENCHANTCRAFT
+# Chỉnh sửa xong, lưu file và gõ /ec reload trong game!
+# ============================================================
+
+enchants:
+  hut_mau:
+    display_name: "Hút Máu I"
+    target: SWORD
+    description: "30% tỉ lệ hồi 2 máu khi chém trúng mục tiêu"
+    trigger: ATTACK
+    chance: 0.30
+    cooldown: 0
+    recipe:
+      shape:
+        - "RDR"
+        - "DBD"
+        - "RDR"
+      ingredients:
+        R: REDSTONE_BLOCK
+        D: DIAMOND
+        B: BOOK
+    actions:
+      - "HEAL:2.0"
+
+  loi_dinh:
+    display_name: "Lôi Đình I"
+    target: WEAPON
+    description: "25% tỉ lệ giáng sét gây 4 sát thương chuẩn"
+    trigger: ATTACK
+    chance: 0.25
+    cooldown: 2
+    recipe:
+      shape:
+        - "GCG"
+        - "CBC"
+        - "GCG"
+      ingredients:
+        G: GOLD_BLOCK
+        C: COPPER_BLOCK
+        B: BOOK
+    actions:
+      - "LIGHTNING_EFFECT"
+      - "DAMAGE:4.0"
