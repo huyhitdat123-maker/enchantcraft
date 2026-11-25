@@ -1,7 +1,6 @@
 package com.enchantcraft;
 
 import com.enchantcraft.enchants.CustomEnchant;
-import com.enchantcraft.enchants.EnchantList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -12,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,10 +21,9 @@ public class EnchantCraftPlugin extends JavaPlugin implements TabCompleter {
 
     @Override
     public void onEnable() {
+        saveDefaultEnchantsFile();
         this.enchantManager = new EnchantManager(this);
-
-        // Nạp toàn bộ phù phép từ file EnchantList
-        EnchantList.registerAll(enchantManager);
+        this.enchantManager.loadEnchants();
 
         getServer().getPluginManager().registerEvents(enchantManager, this);
         if (getCommand("enchantcraft") != null) {
@@ -34,8 +33,22 @@ public class EnchantCraftPlugin extends JavaPlugin implements TabCompleter {
         getLogger().info("EnchantCraft da khoi dong thanh cong voi " + enchantManager.getAllEnchants().size() + " phu phep!");
     }
 
+    public void saveDefaultEnchantsFile() {
+        if (!getDataFolder().exists()) {
+            getDataFolder().mkdirs();
+        }
+        saveResource("enchants.yml", false);
+    }
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
+            saveDefaultEnchantsFile();
+            enchantManager.loadEnchants();
+            sender.sendMessage(Component.text("Đã tải lại EnchantCraft (" + enchantManager.getAllEnchants().size() + " phù phép)!", NamedTextColor.GREEN));
+            return true;
+        }
+
         if (!(sender instanceof Player player)) {
             sender.sendMessage("Lenh nay chi danh cho nguoi choi!");
             return true;
@@ -45,7 +58,7 @@ public class EnchantCraftPlugin extends JavaPlugin implements TabCompleter {
             String list = enchantManager.getAllEnchants().stream()
                     .map(CustomEnchant::getId)
                     .collect(Collectors.joining(", "));
-            player.sendMessage(Component.text("Danh sách phù phép: " + list, NamedTextColor.YELLOW));
+            player.sendMessage(Component.text("Danh sách phù phép: " + list + " (hoặc /ec reload)", NamedTextColor.YELLOW));
             return true;
         }
 
@@ -63,9 +76,11 @@ public class EnchantCraftPlugin extends JavaPlugin implements TabCompleter {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
             String input = args[0].toLowerCase();
-            return enchantManager.getAllEnchants().stream()
-                    .map(CustomEnchant::getId)
-                    .filter(id -> id.startsWith(input))
+            List<String> suggestions = new ArrayList<>();
+            suggestions.add("reload");
+            enchantManager.getAllEnchants().forEach(e -> suggestions.add(e.getId()));
+            return suggestions.stream()
+                    .filter(s -> s.startsWith(input))
                     .collect(Collectors.toList());
         }
         return List.of();
