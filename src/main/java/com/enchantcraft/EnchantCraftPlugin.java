@@ -3,6 +3,7 @@ package com.enchantcraft;
 import com.enchantcraft.enchants.CustomEnchant;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -26,6 +27,8 @@ public class EnchantCraftPlugin extends JavaPlugin implements TabCompleter {
         this.enchantManager.loadEnchants();
 
         getServer().getPluginManager().registerEvents(enchantManager, this);
+        Bukkit.getScheduler().runTaskTimer(this, () -> enchantManager.tickPassives(), 40L, 40L);
+
         if (getCommand("enchantcraft") != null) {
             getCommand("enchantcraft").setTabCompleter(this);
         }
