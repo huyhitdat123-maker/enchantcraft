@@ -1,18 +1,21 @@
 package com.enchantcraft;
 
+import com.enchantcraft.enchants.CustomEnchant;
+import com.enchantcraft.enchants.EnchantList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class EnchantCraftPlugin extends JavaPlugin {
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class EnchantCraftPlugin extends JavaPlugin implements TabCompleter {
 
     private EnchantManager enchantManager;
 
@@ -20,33 +23,15 @@ public class EnchantCraftPlugin extends JavaPlugin {
     public void onEnable() {
         this.enchantManager = new EnchantManager(this);
 
-        // Đăng ký sự kiện ép sách & kích hoạt hiệu ứng
+        // Nạp toàn bộ phù phép từ file EnchantList
+        EnchantList.registerAll(enchantManager);
+
         getServer().getPluginManager().registerEvents(enchantManager, this);
-
-        // Đăng ký công thức chế tạo sách phù phép
-        registerEnchantRecipes();
-
-        getLogger().info("EnchantCraft da khoi dong thanh cong!");
-    }
-
-    private void registerEnchantRecipes() {
-        // Công thức mẫu: Sách Hút Máu I
-        NamespacedKey hutMauKey = new NamespacedKey(this, "craft_hut_mau_1");
-        if (Bukkit.getRecipe(hutMauKey) != null) {
-            Bukkit.removeRecipe(hutMauKey);
+        if (getCommand("enchantcraft") != null) {
+            getCommand("enchantcraft").setTabCompleter(this);
         }
 
-        ShapedRecipe hutMauRecipe = new ShapedRecipe(hutMauKey, enchantManager.createEnchantBook("hut_mau"));
-        hutMauRecipe.shape(
-                "RDR",
-                "DBD",
-                "RDR"
-        );
-        hutMauRecipe.setIngredient('R', Material.REDSTONE_BLOCK);
-        hutMauRecipe.setIngredient('D', Material.DIAMOND);
-        hutMauRecipe.setIngredient('B', Material.BOOK);
-
-        Bukkit.addRecipe(hutMauRecipe);
+        getLogger().info("EnchantCraft da khoi dong thanh cong voi " + enchantManager.getAllEnchants().size() + " phu phep!");
     }
 
     @Override
@@ -57,17 +42,32 @@ public class EnchantCraftPlugin extends JavaPlugin {
         }
 
         if (args.length == 0) {
-            player.sendMessage(Component.text("Sử dụng: /ec hut_mau", NamedTextColor.YELLOW));
+            String list = enchantManager.getAllEnchants().stream()
+                    .map(CustomEnchant::getId)
+                    .collect(Collectors.joining(", "));
+            player.sendMessage(Component.text("Danh sách phù phép: " + list, NamedTextColor.YELLOW));
             return true;
         }
 
-        String id = args[0].toLowerCase();
-        if (id.equals("hut_mau")) {
-            player.getInventory().addItem(enchantManager.createEnchantBook("hut_mau"));
-            player.sendMessage(Component.text("Đã nhận Sách Phù Phép: Hút Máu I", NamedTextColor.GREEN));
+        CustomEnchant enchant = enchantManager.getEnchant(args[0]);
+        if (enchant != null) {
+            player.getInventory().addItem(enchantManager.createEnchantBook(enchant.getId()));
+            player.sendMessage(Component.text("Đã nhận Sách Phù Phép: " + enchant.getDisplayName(), NamedTextColor.GREEN));
         } else {
-            player.sendMessage(Component.text("Không tìm thấy phù phép: " + id, NamedTextColor.RED));
+            player.sendMessage(Component.text("Không tìm thấy phù phép: " + args[0], NamedTextColor.RED));
         }
         return true;
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        if (args.length == 1) {
+            String input = args[0].toLowerCase();
+            return enchantManager.getAllEnchants().stream()
+                    .map(CustomEnchant::getId)
+                    .filter(id -> id.startsWith(input))
+                    .collect(Collectors.toList());
+        }
+        return List.of();
     }
 }
