@@ -205,17 +205,18 @@ random_tiers:
       - "nguyen_phuong"
 
 # ==============================================================================
-# DANH SÁCH 80 PHÙ PHÉP ENCHANTCRAFT
+# DANH SÁCH 80 PHÙ PHÉP (KỸ NĂNG MAX 3 | BỊ ĐỘNG MAX 5 | ĐẶC THÙ 1)
 # ==============================================================================
 enchants:
   # -------------------- 1. BẬC THƯỜNG (29 CUỐN) --------------------
   hut_mau:
-    display_name: "Hút Máu I"
+    display_name: "Hút Máu"
     target: SWORD
-    description: "30% tỉ lệ hồi 2 máu khi chém trúng mục tiêu"
+    description: "Tỉ lệ hồi máu khi chém trúng mục tiêu (tăng theo cấp)"
     trigger: ATTACK
     chance: 0.30
     cooldown: 0
+    max_level: 5
     actions:
       - "HEAL:2.0"
       - "PARTICLE:HEART:4"
@@ -227,16 +228,18 @@ enchants:
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "POTION_SELF:night_vision:1:300"
 
   gai_doc:
-    display_name: "Giáp Gai Độc I"
+    display_name: "Giáp Gai Độc"
     target: ARMOR
-    description: "30% tỉ lệ đầu độc và làm chậm kẻ tấn công bạn"
+    description: "Tỉ lệ đầu độc và làm chậm kẻ tấn công bạn (tăng theo cấp)"
     trigger: DEFEND
     chance: 0.30
     cooldown: 2
+    max_level: 5
     actions:
       - "POTION_TARGET:poison:2:60"
       - "POTION_TARGET:slowness:1:60"
@@ -244,40 +247,45 @@ enchants:
   chuc_phuc:
     display_name: "Chúc Phúc"
     target: ARMOR
-    description: "Tự động hồi 1 máu (0.5 tim) mỗi 3 giây khi mặc"
+    description: "Tự động hồi máu mỗi 3 giây khi mặc (tăng lượng hồi theo cấp)"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 3
+    max_level: 5
     actions:
       - "HEAL:1.0"
 
   troi_chan:
     display_name: "Trói Chân"
     target: WEAPON
-    description: "30% tỉ lệ làm chậm cực mạnh kẻ địch trong 2.5 giây"
+    description: "Tỉ lệ làm chậm cực mạnh kẻ địch trong 2.5 giây"
     trigger: ATTACK
     chance: 0.30
     cooldown: 2
+    max_level: 5
     actions:
       - "POTION_TARGET:slowness:4:50"
 
   lien_ket:
     display_name: "Liên Kết"
     target: ALL
-    description: "Khóa chặt vật phẩm: không thể vứt bỏ hay cất vào rương cho đến khi hỏng"
+    description: "Khóa linh hồn: không thể vứt, cất rương, mất khi chết hay bị trộm"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "SOULBOUND"
 
   don_tho:
     display_name: "Độn Thổ"
     target: PICKAXE_SHOVEL
-    description: "Giữ Shift + Chuột Phải vào vách đá/đất để khoan hầm 1x2 dài 5 block"
+    description: "[Kỹ năng] Giữ Shift + Chuột Phải vào vách đá/đất để khoan hầm 1x2"
     trigger: SNEAK_INTERACT
     chance: 1.0
     cooldown: 4
+    max_level: 3
+    active_skill: true
     actions:
       - "TUNNEL_1X2:5"
 
@@ -288,6 +296,7 @@ enchants:
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "AQUA_CURSE"
 
@@ -298,6 +307,7 @@ enchants:
     trigger: MINE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "GAMBLE_ORE"
 
@@ -308,6 +318,7 @@ enchants:
     trigger: ATTACK
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "RANDOM_DAMAGE:1.0:12.0"
 
@@ -318,6 +329,7 @@ enchants:
     trigger: SHOOT
     chance: 0.35
     cooldown: 0
+    max_level: 1
     actions:
       - "SELF_DAMAGE:3.0"
       - "ACTIONBAR:&c✖ Đinh ba phản chủ!"
@@ -329,6 +341,7 @@ enchants:
     trigger: ATTACK
     chance: 0.20
     cooldown: 0
+    max_level: 1
     actions:
       - "FAKE_DURABILITY"
 
@@ -339,6 +352,7 @@ enchants:
     trigger: PASSIVE
     chance: 1.0
     cooldown: 5
+    max_level: 1
     actions:
       - "BROKEN_LEG"
 
@@ -349,6 +363,7 @@ enchants:
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "POTION_SELF:blindness:1:100"
 
@@ -359,6 +374,7 @@ enchants:
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "POTION_SELF:weakness:2:100"
       - "POTION_SELF:mining_fatigue:2:100"
@@ -370,6 +386,7 @@ enchants:
     trigger: ATTACK
     chance: 0.05
     cooldown: 0
+    max_level: 1
     actions:
       - "SELF_DESTRUCT"
 
@@ -380,6 +397,7 @@ enchants:
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "POTION_SELF:hunger:3:100"
 
@@ -390,6 +408,7 @@ enchants:
     trigger: ATTACK
     chance: 0.08
     cooldown: 1
+    max_level: 1
     actions:
       - "DROP_HAND"
 
@@ -400,6 +419,7 @@ enchants:
     trigger: DEFEND
     chance: 0.10
     cooldown: 2
+    max_level: 1
     actions:
       - "SELF_LIGHTNING"
 
@@ -410,6 +430,7 @@ enchants:
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "POTION_SELF:jump_boost:251:100"
 
@@ -420,16 +441,18 @@ enchants:
     trigger: DEFEND
     chance: 0.50
     cooldown: 5
+    max_level: 1
     actions:
       - "GHAST_SCREAM"
 
   say_xin:
     display_name: "Say Xỉn"
     target: HELMET
-    description: "Chóng mặt buồn nôn liên tục nhưng bù lại nhận Sức Mạnh I"
+    description: "Chóng mặt buồn nôn liên tục nhưng bù lại nhận Sức Mạnh"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "POTION_SELF:nausea:1:120"
       - "POTION_SELF:strength:1:100"
@@ -441,16 +464,18 @@ enchants:
     trigger: ATTACK
     chance: 0.01
     cooldown: 0
+    max_level: 1
     actions:
       - "INSTANT_DEATH"
 
   xui_xeo:
     display_name: "Xui Xẻo"
     target: ALL
-    description: "Dính Xui Xẻo III và 20% tỉ lệ làm bốc hơi vật phẩm khi đào/đánh quái"
+    description: "20% tỉ lệ làm bốc hơi vật phẩm khi đào/đánh quái"
     trigger: MINE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "VAPORIZE_DROP:0.20"
 
@@ -461,6 +486,7 @@ enchants:
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "DOUBLE_TRADE"
 
@@ -471,6 +497,7 @@ enchants:
     trigger: PASSIVE
     chance: 1.0
     cooldown: 5
+    max_level: 1
     actions:
       - "PULL_MOBS:12.0"
 
@@ -481,6 +508,7 @@ enchants:
     trigger: MINE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "ROT_DROP:0.25"
 
@@ -491,6 +519,7 @@ enchants:
     trigger: DEFEND
     chance: 0.20
     cooldown: 2
+    max_level: 1
     actions:
       - "RANDOM_TP:8.0"
 
@@ -501,109 +530,120 @@ enchants:
     trigger: PASSIVE
     chance: 0.25
     cooldown: 6
+    max_level: 1
     actions:
       - "SELF_IGNITE:60"
 
   # -------------------- 2. BẬC HIẾM (18 CUỐN) --------------------
   loi_dinh:
-    display_name: "Lôi Đình I"
+    display_name: "Lôi Đình"
     target: WEAPON
-    description: "25% tỉ lệ giáng sét gây 4 sát thương chuẩn"
+    description: "Giáng sét gây sát thương chuẩn xuyên giáp (tăng theo cấp)"
     trigger: ATTACK
     chance: 0.25
     cooldown: 2
+    max_level: 5
     actions:
       - "LIGHTNING_EFFECT"
       - "TRUE_DAMAGE:4.0"
 
   chem_lan:
-    display_name: "Chém Lan I"
+    display_name: "Chém Lan"
     target: WEAPON
-    description: "35% tỉ lệ quét kiếm gây 4 sát thương diện rộng 3.5 block"
+    description: "Quét kiếm gây sát thương diện rộng xung quanh (tăng tầm & sát thương theo cấp)"
     trigger: ATTACK
     chance: 0.35
     cooldown: 1
+    max_level: 5
     actions:
       - "CLEAVE:3.5:4.0"
       - "PARTICLE:SWEEP_ATTACK:3"
 
   cung_no:
-    display_name: "Tên Bùng Nổ I"
+    display_name: "Tên Bùng Nổ"
     target: BOW
-    description: "35% tỉ lệ tạo vụ nổ không phá địa hình khi bắn trúng"
+    description: "Tạo vụ nổ không phá địa hình khi bắn trúng (tăng theo cấp)"
     trigger: ATTACK
     chance: 0.35
     cooldown: 2
+    max_level: 5
     actions:
       - "SAFE_EXPLODE:2.0:4.0"
 
   tu_sua:
     display_name: "Tự Sửa"
     target: ALL
-    description: "Tự động hồi phục 2 điểm độ bền mỗi 2 giây khi cầm hoặc mặc"
+    description: "Tự động hồi phục độ bền mỗi 2 giây khi cầm hoặc mặc (tăng theo cấp)"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 5
     actions:
       - "REPAIR:2"
 
   giap_no:
     display_name: "Giáp Nổ"
     target: CHESTPLATE
-    description: "25% tỉ lệ phát nổ đẩy lùi và gây sát thương kẻ địch khi bị đánh"
+    description: "Phát nổ đẩy lùi và gây sát thương kẻ địch khi bị đánh (tăng theo cấp)"
     trigger: DEFEND
     chance: 0.25
     cooldown: 5
+    max_level: 5
     actions:
       - "SAFE_EXPLODE:2.5:5.0"
 
   giap_ao:
     display_name: "Giáp Ảo"
     target: ARMOR
-    description: "20% tỉ lệ nhận 2 tim vàng bảo hộ trong 10 giây khi bị đánh"
+    description: "Nhận tim vàng bảo hộ trong 10 giây khi bị đánh (tăng cấp tim vàng theo cấp)"
     trigger: DEFEND
     chance: 0.20
     cooldown: 15
+    max_level: 5
     actions:
       - "POTION_SELF:absorption:1:200"
 
   sat_thu:
     display_name: "Sát Thủ"
     target: BOW
-    description: "Cộng thêm +4 sát thương chuẩn cho mỗi mũi tên bắn trúng"
+    description: "Cộng thêm sát thương chuẩn cho mỗi mũi tên bắn trúng (tăng theo cấp)"
     trigger: ATTACK
     chance: 1.0
     cooldown: 0
+    max_level: 5
     actions:
       - "TRUE_DAMAGE:4.0"
 
   kiem_mu:
     display_name: "Kiếm Mù"
     target: SWORD
-    description: "25% tỉ lệ khiến kẻ địch bị mù lòa trong 2.5 giây"
+    description: "Tỉ lệ khiến kẻ địch bị mù lòa trong 2.5 giây (tăng tỉ lệ theo cấp)"
     trigger: ATTACK
     chance: 0.25
     cooldown: 2
+    max_level: 5
     actions:
       - "POTION_TARGET:blindness:1:50"
 
   phan_chan:
     display_name: "Khiên Phản Chấn"
     target: ARMOR
-    description: "25% tỉ lệ phản ngược 50% sát thương vừa nhận vào kẻ tấn công"
+    description: "Phản ngược sát thương vừa nhận vào kẻ tấn công (tăng tỉ lệ phản theo cấp)"
     trigger: DEFEND
     chance: 0.25
     cooldown: 1
+    max_level: 5
     actions:
       - "REFLECT_DAMAGE:0.50"
 
   bang_phong:
     display_name: "Băng Phong Trảm"
     target: SWORD
-    description: "30% tỉ lệ đóng băng kẻ địch 4 giây và làm chậm tốc độ đánh"
+    description: "Đóng băng kẻ địch và làm chậm tốc độ đánh (tăng theo cấp)"
     trigger: ATTACK
     chance: 0.30
     cooldown: 2
+    max_level: 5
     actions:
       - "FREEZE:140"
       - "POTION_TARGET:mining_fatigue:3:80"
@@ -612,10 +652,11 @@ enchants:
   thuy_than:
     display_name: "Thủy Thần Hộ Thể"
     target: LEGGINGS
-    description: "Nhận Bơi Nhanh, Thở Dưới Nước và Sức Mạnh I khi chạm nước hoặc trời mưa"
+    description: "Nhận Bơi Nhanh, Thở Dưới Nước và Sức Mạnh khi chạm nước hoặc trời mưa"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 5
     actions:
       - "WATER_BUFF:dolphins_grace:1:80"
       - "WATER_BUFF:water_breathing:1:80"
@@ -624,20 +665,22 @@ enchants:
   mat_sang:
     display_name: "Mắt Sáng"
     target: HELMET
-    description: "Quét phát sáng viền mọi quái vật và người chơi trong bán kính 20 block"
+    description: "Quét phát sáng viền quái vật & người chơi xung quanh (tăng tầm quét theo cấp)"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 3
+    max_level: 5
     actions:
       - "SCAN_GLOW:20.0:80"
 
   chuot_chui:
     display_name: "Chuột Chũi"
     target: TOOL
-    description: "Nhận Đào Nhanh III và Nhìn Đêm khi xuống dưới độ cao Y = 50"
+    description: "Nhận Đào Nhanh và Nhìn Đêm khi xuống dưới độ cao Y = 50 (tăng cấp Đào Nhanh)"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 5
     actions:
       - "UNDERGROUND_BUFF:50:haste:3:80"
       - "UNDERGROUND_BUFF:50:night_vision:1:260"
@@ -649,6 +692,7 @@ enchants:
     trigger: PASSIVE
     chance: 1.0
     cooldown: 2
+    max_level: 1
     actions:
       - "FEED:2:2.0"
 
@@ -659,36 +703,41 @@ enchants:
     trigger: MINE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "HARVEST_3X3"
 
   kho_heo_hoa:
     display_name: "Khô Héo Hóa"
     target: WEAPON_BOW
-    description: "30% tỉ lệ gây hiệu ứng Héo Úa II trong 4 giây lên mục tiêu"
+    description: "Gây hiệu ứng Héo Úa trong 4 giây lên mục tiêu (tăng cấp Héo Úa theo cấp)"
     trigger: ATTACK
     chance: 0.30
     cooldown: 2
+    max_level: 5
     actions:
       - "POTION_TARGET:wither:2:80"
 
   ho_than:
     display_name: "Hộ Thân"
     target: ARMOR
-    description: "35% tỉ lệ chặn đứng sát thương tên/cầu lửa và bật ngược đạn bay lại"
+    description: "Tỉ lệ chặn đứng tên/cầu lửa và bật ngược đạn bay lại (tăng tỉ lệ theo cấp)"
     trigger: DEFEND
     chance: 0.35
     cooldown: 1
+    max_level: 5
     actions:
       - "DEFLECT_PROJECTILE"
 
   buoc_nhay:
     display_name: "Bước Nhảy Không Gian"
     target: BOOTS
-    description: "Chuột phải để dịch chuyển tức thời qua khoảng trống phía trước 10 block"
+    description: "[Kỹ năng] Chuột phải để dịch chuyển tức thời qua khoảng trống phía trước"
     trigger: INTERACT
     chance: 1.0
     cooldown: 5
+    max_level: 3
+    active_skill: true
     actions:
       - "BLINK:10.0"
 
@@ -696,20 +745,23 @@ enchants:
   dao_mach_quang:
     display_name: "Thợ Mỏ Thần Tốc"
     target: TOOL
-    description: "Đào cả mạch quặng hoặc chặt đổ cả thân cây (tối đa 16 khối)"
+    description: "Đào cả mạch quặng hoặc chặt đổ cả thân cây (tăng giới hạn khối theo cấp)"
     trigger: MINE
     chance: 1.0
     cooldown: 0
+    max_level: 5
     actions:
       - "VEIN_MINE:16"
 
   luot_gio:
-    display_name: "Lướt Gió I"
+    display_name: "Lướt Gió"
     target: BOOTS
-    description: "Bấm Shift khi đang mang giày để lướt vút về phía trước (hồi 3s)"
+    description: "[Kỹ năng] Bấm Shift khi mang giày để lướt vút về phía trước (hồi 3s)"
     trigger: SNEAK
     chance: 1.0
     cooldown: 3
+    max_level: 3
+    active_skill: true
     actions:
       - "DASH:1.7"
       - "SOUND:entity.breeze.jump"
@@ -719,110 +771,123 @@ enchants:
   phi_thien:
     display_name: "Phi Thiên Vô Cực"
     target: BOOTS
-    description: "Nhận hiệu ứng Nhảy Cao cấp 4 vĩnh viễn khi mang giày"
+    description: "Nhận hiệu ứng Nhảy Cao vĩnh viễn khi mang giày (tăng độ cao theo cấp)"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 5
     actions:
       - "POTION_SELF:jump_boost:4:100"
 
   kiem_y:
     display_name: "Kiếm Ý"
     target: SWORD
-    description: "Nhận hiệu ứng Sức Mạnh II khi cầm kiếm trên tay"
+    description: "Nhận hiệu ứng Sức Mạnh khi cầm kiếm trên tay (tăng cấp Sức Mạnh theo cấp)"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 5
     actions:
       - "POTION_SELF:strength:2:100"
 
   ao_choang_ra:
     display_name: "Áo Choàng Thần Ra"
     target: CHESTPLATE
-    description: "Tỏa vòng lửa bán kính 3 block, thiêu đốt mọi mục tiêu lại gần"
+    description: "Tỏa vòng lửa thiêu đốt mọi mục tiêu lại gần (tăng bán kính & sát thương theo cấp)"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 2
+    max_level: 5
     actions:
       - "FIRE_AURA:3.0:60:1.0"
 
   lien_kich:
     display_name: "Liên Kích"
     target: BOW
-    description: "35% tỉ lệ bắn bồi thêm 2 mũi tên liên tiếp không tốn tên"
+    description: "Tỉ lệ bắn bồi thêm mũi tên liên tiếp không tốn tên (tăng số tên theo cấp)"
     trigger: SHOOT
     chance: 0.35
     cooldown: 2
+    max_level: 5
     actions:
       - "MULTI_SHOT:2"
 
   gao_thet:
     display_name: "Gào Thét"
     target: HELMET
-    description: "20% tỉ lệ bắn tia Sóng Âm Warden gây 6 sát thương xuyên giáp khi bị đánh"
+    description: "Bắn tia Sóng Âm Warden gây sát thương xuyên giáp khi bị đánh (tăng theo cấp)"
     trigger: DEFEND
     chance: 0.20
     cooldown: 5
+    max_level: 5
     actions:
       - "SONIC_BOOM:6.0"
 
   khoi_hoa:
     display_name: "Khối Hóa"
     target: PICKAXE
-    description: "15% tỉ lệ biến quặng đào được thành nguyên Khối (Block) tương ứng"
+    description: "Tỉ lệ biến quặng đào được thành nguyên Khối tương ứng (tăng tỉ lệ theo cấp)"
     trigger: MINE
     chance: 1.0
     cooldown: 0
+    max_level: 5
     actions:
       - "BLOCKIFY:0.15"
 
   thuan_di:
     display_name: "Thuấn Di"
     target: SWORD
-    description: "Chuột phải khi ngắm mục tiêu tầm 8 block để dịch chuyển ra sau lưng"
+    description: "[Kỹ năng] Chuột phải khi ngắm mục tiêu để dịch chuyển ra sau lưng"
     trigger: INTERACT
     chance: 1.0
     cooldown: 6
+    max_level: 3
+    active_skill: true
     actions:
       - "TELEPORT_BEHIND:8.0"
 
   hap_tinh:
     display_name: "Hấp Tinh Đại Pháp"
     target: WEAPON
-    description: "Hút trực tiếp 15 điểm XP của đối thủ sang cho bản thân khi chém trúng"
+    description: "Hút trực tiếp điểm XP của đối thủ sang cho bản thân (tăng XP hút theo cấp)"
     trigger: ATTACK
     chance: 1.0
     cooldown: 1
+    max_level: 5
     actions:
       - "STEAL_XP:15"
 
   midas:
     display_name: "Bàn Tay Midas"
     target: SWORD_PICKAXE
-    description: "12% tỉ lệ biến vật phẩm rơi ra thành Thỏi Vàng (1% ra Táo Vàng)"
+    description: "Tỉ lệ biến vật phẩm rơi ra thành Thỏi Vàng hoặc Táo Vàng (tăng theo cấp)"
     trigger: MINE
     chance: 1.0
     cooldown: 0
+    max_level: 5
     actions:
       - "MIDAS_TOUCH"
 
   hoi_tho_rong:
     display_name: "Hơi Thở Rồng"
     target: SWORD
-    description: "Chuột phải phun vùng khí Hơi Thở Rồng tồn tại 4 giây tại mục tiêu"
+    description: "[Kỹ năng] Chuột phải phun vùng khí Hơi Thở Rồng tại điểm ngắm"
     trigger: INTERACT
     chance: 1.0
     cooldown: 6
+    max_level: 3
+    active_skill: true
     actions:
       - "DRAGON_BREATH:80"
 
   khinh_cong:
     display_name: "Khinh Công Thảo Thượng Phi"
     target: BOOTS
-    description: "Tăng tốc độ chạy và miễn nhiễm hoàn toàn sát thương rơi từ trên cao"
+    description: "Tăng tốc độ chạy (theo cấp) và miễn nhiễm hoàn toàn sát thương rơi"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 5
     actions:
       - "NO_FALL_DAMAGE"
       - "POTION_SELF:speed:1:100"
@@ -830,20 +895,22 @@ enchants:
   can_khon:
     display_name: "Càn Khôn Đảo Ngược"
     target: ARMOR
-    description: "20% tỉ lệ hoán đổi vị trí với kẻ tấn công và làm mù đối thủ 1.5s"
+    description: "Tỉ lệ hoán đổi vị trí với kẻ tấn công và làm mù đối thủ (tăng tỉ lệ theo cấp)"
     trigger: DEFEND
     chance: 0.20
     cooldown: 6
+    max_level: 5
     actions:
       - "SWAP_POS"
 
   hap_huyet:
     display_name: "Hấp Huyết Ma Công"
     target: WEAPON
-    description: "30% tỉ lệ gây Héo Úa II trong 3s và chuyển hóa 25% sát thương thành máu"
+    description: "Gây Héo Úa và chuyển hóa sát thương thành máu (tăng theo cấp)"
     trigger: ATTACK
     chance: 0.30
     cooldown: 1
+    max_level: 5
     actions:
       - "POTION_TARGET:wither:2:60"
       - "LIFESTEAL:0.25"
@@ -851,20 +918,22 @@ enchants:
   ke_trom:
     display_name: "Kẻ Trộm"
     target: WEAPON
-    description: "15% tỉ lệ móc túi cướp ngẫu nhiên 1 món đồ trong túi nạn nhân"
+    description: "Tỉ lệ móc túi cướp ngẫu nhiên 1 món đồ không khóa trong túi nạn nhân"
     trigger: ATTACK
     chance: 0.15
     cooldown: 10
+    max_level: 5
     actions:
       - "STEAL_ITEM"
 
   trong_truong:
     display_name: "Trọng Trường"
     target: BOW
-    description: "30% tỉ lệ tạo Hố Đen 3 giây hút mọi mục tiêu trong 6 block và rút máu"
+    description: "Tạo Hố Đen hút mọi mục tiêu xung quanh và rút máu (tăng bán kính & thời gian)"
     trigger: ATTACK
     chance: 0.30
     cooldown: 6
+    max_level: 5
     actions:
       - "BLACK_HOLE:6.0:3"
 
@@ -876,6 +945,7 @@ enchants:
     trigger: MINE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "MINE_3X3"
 
@@ -886,6 +956,7 @@ enchants:
     trigger: MINE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "AUTO_SMELT"
       - "MAGNET"
@@ -894,20 +965,22 @@ enchants:
   giap_gaia:
     display_name: "Giáp Gaia"
     target: ARMOR
-    description: "Nâng giới hạn máu tối đa thêm +4 tim (28 máu) khi mặc"
+    description: "Nâng giới hạn máu tối đa thêm +4 đến +8 tim khi mặc (tăng theo cấp)"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 5
     actions:
       - "MAX_HEALTH:8.0"
 
   trau_bo:
     display_name: "Trâu Bò"
     target: ARMOR
-    description: "Nhận hiệu ứng Kháng Cự cấp 3 (giảm 60% mọi sát thương) khi mặc"
+    description: "Nhận hiệu ứng Kháng Cự giảm sát thương khi mặc (tăng cấp Kháng Cự theo cấp)"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 5
     actions:
       - "POTION_SELF:resistance:3:100"
 
@@ -918,6 +991,7 @@ enchants:
     trigger: FATAL_DAMAGE
     chance: 1.0
     cooldown: 180
+    max_level: 1
     actions:
       - "REVIVE:0.50"
       - "SAFE_EXPLODE:3.5:6.0"
@@ -925,10 +999,12 @@ enchants:
   van_kiem:
     display_name: "Vạn Kiếm Quy Tông"
     target: SWORD
-    description: "Chuột phải phóng loạt 15 phi kiếm xuyên giáp từ thanh kiếm lao thẳng tới mục tiêu (hồi 1s)"
+    description: "[Kỹ năng] Chuột phải phóng loạt phi kiếm xuyên giáp lao tới mục tiêu (tối đa Cấp III)"
     trigger: INTERACT
     chance: 1.0
     cooldown: 1
+    max_level: 3
+    active_skill: true
     actions:
       - "SWORD_BARRAGE:15:6.0"
 
@@ -936,47 +1012,55 @@ enchants:
   thanh_long:
     display_name: "Thanh Long"
     target: WEAPON
-    description: "30% tỉ lệ gọi Lôi Long giáng sét +4 sát thương chuẩn, hồi 2 máu và tăng tốc"
+    description: "[Kỹ năng] Đánh thường giáng sét + hồi máu; Chuột phải phóng Quả Cầu Sấm Sét (tối đa Cấp III)"
     trigger: ATTACK
     chance: 0.30
     cooldown: 2
+    max_level: 3
+    active_skill: true
     actions:
       - "LIGHTNING_EFFECT"
       - "TRUE_DAMAGE:4.0"
       - "HEAL:2.0"
       - "POTION_SELF:speed:2:60"
+      - "THANH_LONG_ORB"
 
   bach_ho:
     display_name: "Bạch Hổ"
     target: WEAPON
-    description: "25% tỉ lệ kích hoạt Hổ Khiếu gây +50% sát thương chí mạng và làm suy yếu địch"
+    description: "[Kỹ năng] Đánh thường lướt chém; Chuột phải phóng Phá Thiên Kiếm Khí xuyên thấu (tối đa Cấp III)"
     trigger: ATTACK
-    chance: 0.25
-    cooldown: 2
+    chance: 1.0
+    cooldown: 0
+    max_level: 3
+    active_skill: true
     actions:
-      - "BONUS_DAMAGE_PCT:0.50"
-      - "POTION_TARGET:weakness:1:60"
-      - "PARTICLE:SWEEP_ATTACK:5"
+      - "BACH_HO_DASH_CLEAVE"
 
   chu_tuoc:
     display_name: "Chu Tước"
     target: BOW
-    description: "30% tỉ lệ hóa Hỏa Điểu nổ vòng lửa bán kính 3.5 block, thiêu đốt và hồi máu"
+    description: "[Kỹ năng] Bắn tên nổ lửa; Chuột trái cầm cung phóng quạt cầu lửa Ghast không thể phản (tối đa Cấp III)"
     trigger: ATTACK
     chance: 0.30
     cooldown: 2
+    max_level: 3
+    active_skill: true
     actions:
       - "SAFE_EXPLODE:3.5:5.0"
       - "IGNITE:80"
       - "HEAL:2.0"
+      - "CHU_TUOC_FIREBALLS:5"
 
   huyen_vu:
     display_name: "Huyền Vũ"
     target: ARMOR
-    description: "Miễn nhiễm mọi hiệu ứng bất lợi và tăng +1 cấp cho hiệu ứng có lợi"
+    description: "[Kỹ năng] Miễn nhiễm bất lợi + tăng 1 cấp buff; bấm Shift tạo Kết Giới Quy Giáp miễn nhiễm sát thương (tối đa Cấp III)"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 3
+    active_skill: true
     actions:
       - "CLEANSE"
       - "BOOST_BUFFS"
@@ -984,10 +1068,12 @@ enchants:
   ky_lan:
     display_name: "Kỳ Lân"
     target: ALL
-    description: "Nhận May Mắn III và 20% tỉ lệ nhân đôi vật phẩm khi đào quặng"
+    description: "[Kỹ năng] Tăng tỉ lệ x2 rơi đồ & XP; bấm Shift giáng Thánh Quang hồi máu diện rộng (tối đa Cấp III)"
     trigger: MINE
     chance: 1.0
     cooldown: 0
+    max_level: 3
+    active_skill: true
     actions:
       - "DOUBLE_DROP:0.20"
       - "EXP_BOOST:3"
@@ -1000,6 +1086,7 @@ enchants:
     trigger: PASSIVE
     chance: 1.0
     cooldown: 0
+    max_level: 1
     actions:
       - "UNBREAKABLE"
       - "POTION_SELF:haste:3:100"
@@ -1009,20 +1096,22 @@ enchants:
   tram_hon:
     display_name: "Trảm Hồn"
     target: AXE_MACE
-    description: "Đòn đánh kết liễu ngay lập tức mục tiêu khi máu tụt xuống dưới 15%"
+    description: "Đòn đánh kết liễu ngay lập tức mục tiêu khi máu tụt xuống dưới ngưỡng (tăng theo cấp)"
     trigger: ATTACK
     chance: 1.0
     cooldown: 10
+    max_level: 5
     actions:
       - "EXECUTE:0.15"
 
   diet_than:
     display_name: "Diệt Thần"
     target: AXE_MACE
-    description: "Gây +6 sát thương chuẩn, phá 15 độ bền giáp và xóa sạch Kháng Cự / Tim Vàng"
+    description: "Gây sát thương chuẩn, phá độ bền giáp và xóa sạch Kháng Cự / Tim Vàng (tăng theo cấp)"
     trigger: ATTACK
     chance: 1.0
     cooldown: 4
+    max_level: 5
     actions:
       - "TRUE_DAMAGE:6.0"
       - "SHRED_ARMOR:15"
@@ -1032,10 +1121,12 @@ enchants:
   tu_thanh:
     display_name: "Tứ Thánh Hợp Nhất"
     target: CHESTPLATE
-    description: "Hội tụ sức mạnh Tứ Thánh: Sức Mạnh II, Kháng Cự II, Tốc Độ II, giải độc và Hỏa Hộ Thể"
+    description: "[Kỹ năng] Nội tại Tứ Thánh; bấm Shift khai mở Lãnh Địa Tứ Tượng oanh tạc kẻ địch xung quanh (tối đa Cấp III)"
     trigger: PASSIVE
     chance: 1.0
     cooldown: 2
+    max_level: 3
+    active_skill: true
     actions:
       - "CLEANSE"
       - "POTION_SELF:strength:2:100"
@@ -1046,13 +1137,14 @@ enchants:
   nguyen_phuong:
     display_name: "Nguyên Phượng"
     target: CHESTPLATE
-    description: "Tái sinh 100% máu, nhận Sức Mạnh III + Kháng Lửa và tạo bão lửa bán kính 5 block (hồi 4 phút)"
+    description: "Tái sinh 100% máu, nhận Sức Mạnh III + Kháng Lửa và phóng sóng lửa đẩy lùi mọi kẻ địch tới 10 block (hồi 4 phút)"
     trigger: FATAL_DAMAGE
     chance: 1.0
     cooldown: 240
+    max_level: 1
     actions:
       - "REVIVE:1.0"
       - "CLEANSE"
       - "POTION_SELF:strength:3:200"
       - "POTION_SELF:fire_resistance:1:200"
-      - "SAFE_EXPLODE:5.0:10.0"
+      - "PHOENIX_SHOCKWAVE:10.0:12.0"
