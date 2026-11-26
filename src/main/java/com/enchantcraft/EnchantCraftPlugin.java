@@ -27,10 +27,14 @@ public class EnchantCraftPlugin extends JavaPlugin implements TabCompleter {
         this.enchantManager.loadEnchants();
 
         getServer().getPluginManager().registerEvents(enchantManager, this);
+        // Nhịp quét bị động mỗi 2 giây (40 ticks) để tối ưu TPS
         Bukkit.getScheduler().runTaskTimer(this, () -> enchantManager.tickPassives(), 40L, 40L);
 
         if (getCommand("enchantcraft") != null) {
             getCommand("enchantcraft").setTabCompleter(this);
+        }
+        if (getCommand("random") != null) {
+            getCommand("random").setTabCompleter(this);
         }
 
         getLogger().info("EnchantCraft da khoi dong thanh cong voi " + enchantManager.getAllEnchants().size() + " phu phep!");
@@ -45,6 +49,19 @@ public class EnchantCraftPlugin extends JavaPlugin implements TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (command.getName().equalsIgnoreCase("random")) {
+            if (!(sender instanceof Player player)) {
+                sender.sendMessage("Lenh nay chi danh cho nguoi choi!");
+                return true;
+            }
+            if (args.length > 0 && args[0].equalsIgnoreCase("ce")) {
+                enchantManager.openRandomGui(player);
+            } else {
+                player.sendMessage(Component.text("Sử dụng: /random ce để mở Kho Báu Phù Phép!", NamedTextColor.YELLOW));
+            }
+            return true;
+        }
+
         if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
             saveDefaultEnchantsFile();
             enchantManager.loadEnchants();
@@ -58,10 +75,7 @@ public class EnchantCraftPlugin extends JavaPlugin implements TabCompleter {
         }
 
         if (args.length == 0) {
-            String list = enchantManager.getAllEnchants().stream()
-                    .map(CustomEnchant::getId)
-                    .collect(Collectors.joining(", "));
-            player.sendMessage(Component.text("Danh sách phù phép: " + list + " (hoặc /ec reload)", NamedTextColor.YELLOW));
+            player.sendMessage(Component.text("Tổng cộng " + enchantManager.getAllEnchants().size() + " phù phép. Gõ /ec <tên> hoặc /ec reload.", NamedTextColor.YELLOW));
             return true;
         }
 
@@ -77,6 +91,13 @@ public class EnchantCraftPlugin extends JavaPlugin implements TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        if (command.getName().equalsIgnoreCase("random")) {
+            if (args.length == 1 && "ce".startsWith(args[0].toLowerCase())) {
+                return List.of("ce");
+            }
+            return List.of();
+        }
+
         if (args.length == 1) {
             String input = args[0].toLowerCase();
             List<String> suggestions = new ArrayList<>();
