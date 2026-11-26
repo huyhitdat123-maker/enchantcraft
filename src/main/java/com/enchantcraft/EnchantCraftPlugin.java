@@ -27,7 +27,6 @@ public class EnchantCraftPlugin extends JavaPlugin implements TabCompleter {
         this.enchantManager.loadEnchants();
 
         getServer().getPluginManager().registerEvents(enchantManager, this);
-        // Nhịp quét bị động mỗi 2 giây (40 ticks) để tối ưu TPS
         Bukkit.getScheduler().runTaskTimer(this, () -> enchantManager.tickPassives(), 40L, 40L);
 
         if (getCommand("enchantcraft") != null) {
@@ -49,6 +48,15 @@ public class EnchantCraftPlugin extends JavaPlugin implements TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (command.getName().equalsIgnoreCase("phanra")) {
+            if (!(sender instanceof Player player)) {
+                sender.sendMessage("Lenh nay chi danh cho nguoi choi!");
+                return true;
+            }
+            enchantManager.salvageHeldBook(player);
+            return true;
+        }
+
         if (command.getName().equalsIgnoreCase("random")) {
             if (!(sender instanceof Player player)) {
                 sender.sendMessage("Lenh nay chi danh cho nguoi choi!");
