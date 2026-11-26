@@ -585,7 +585,6 @@ public class EnchantManager implements Listener {
 
         int bookLevel = bookPdc.getOrDefault(bookLevelKey, PersistentDataType.INTEGER, 1);
 
-        // Trường hợp 1: Ghép 2 cuốn sách giống nhau cùng cấp độ trong túi đồ để nâng cấp
         if (target.getType() == Material.ENCHANTED_BOOK && target.hasItemMeta()) {
             PersistentDataContainer targetBookPdc = target.getItemMeta().getPersistentDataContainer();
             String targetEnchantId = targetBookPdc.get(bookEnchantKey, PersistentDataType.STRING);
@@ -630,7 +629,6 @@ public class EnchantManager implements Listener {
             }
         }
 
-        // Trường hợp 2: Ép sách vào trang bị
         if (!enchant.getTargetType().matches(target.getType())) {
             player.sendMessage(Component.text("Phù phép " + enchant.getDisplayName() + " chỉ ép được vào: " + enchant.getTargetType().getLabel(), NamedTextColor.RED));
             return;
@@ -928,7 +926,6 @@ public class EnchantManager implements Listener {
     public void onGeneralDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player victim)) return;
 
-        // Kết Giới Quy Giáp (Huyền Vũ) chặn đứng mọi sát thương
         if (isHuyenVuShieldActive(victim)) {
             event.setCancelled(true);
             victim.getWorld().spawnParticle(Particle.END_ROD, victim.getLocation().add(0, 1.1, 0), 10, 0.5, 0.6, 0.5, 0.04);
@@ -936,7 +933,6 @@ public class EnchantManager implements Listener {
             return;
         }
 
-        // Lãnh Địa Tứ Thánh giảm 50% mọi sát thương nhận vào
         if (isTuThanhDomainActive(victim)) {
             event.setDamage(event.getDamage() * 0.5);
         }
@@ -1007,7 +1003,6 @@ public class EnchantManager implements Listener {
                 attacker = le;
             }
 
-            // Bật ngược đạn bay vào Kết Giới Huyền Vũ
             if (isHuyenVuShieldActive(victim)) {
                 event.setCancelled(true);
                 if (event.getDamager() instanceof Projectile proj) {
@@ -1282,6 +1277,11 @@ public class EnchantManager implements Listener {
             executeActions(List.of("THANH_LONG_ORB"), player, null, player.getLocation(), 0, item, null, thanhLongLvl);
         }
 
+        int bachHoLvl = getAppliedLevel(pdc, "bach_ho");
+        if (bachHoLvl > 0 && !isOnCooldownKey(player, "bach_ho_wave", 5)) {
+            executeActions(List.of("BACH_HO_SWORD_WAVE"), player, null, player.getLocation(), 0, item, null, bachHoLvl);
+        }
+
         if (player.isSneaking() && event.getClickedBlock() != null) {
             triggerItemEnchants(item, TriggerType.SNEAK_INTERACT, player, null, event.getClickedBlock().getLocation(), 0, null);
         } else {
@@ -1300,6 +1300,11 @@ public class EnchantManager implements Listener {
                 int huyenVuLvl = getAppliedLevel(pdc, "huyen_vu");
                 if (huyenVuLvl > 0 && !isOnCooldownKey(player, "huyen_vu_shell", 20)) {
                     executeActions(List.of("HUYEN_VU_SHELL"), player, null, player.getLocation(), 0, item, null, huyenVuLvl);
+                }
+
+                int kyLanLvl = getAppliedLevel(pdc, "ky_lan");
+                if (kyLanLvl > 0 && !isOnCooldownKey(player, "ky_lan_blessing", 18)) {
+                    executeActions(List.of("KY_LAN_BLESSING"), player, null, player.getLocation(), 0, item, null, kyLanLvl);
                 }
 
                 int tuThanhLvl = getAppliedLevel(pdc, "tu_thanh");
@@ -1427,6 +1432,84 @@ public class EnchantManager implements Listener {
 
             try {
                 switch (type) {
+                    case "BACH_HO_SWORD_WAVE" -> {
+                        Location origin = self.getEyeLocation();
+                        Vector dir = origin.getDirection().normalize();
+                        Vector right = new Vector(-dir.getZ(), 0, dir.getX()).normalize();
+                        int maxRange = 12 + level * 2;
+                        double waveDmg = 5.0 + level * 2.0;
+
+                        playSoundSafe(self, "entity.player.attack.sweep", 0.9f);
+                        playSoundSafe(self, "entity.breeze.shoot", 1.2f);
+                        self.sendActionBar(Component.text("🐅 Bạch Hổ " + toRoman(level) + ": Phá Thiên Kiếm Khí!", NamedTextColor.WHITE, TextDecoration.BOLD));
+
+                        new BukkitRunnable() {
+                            int step = 1;
+                            final Set<UUID> hitEntities = new HashSet<>();
+
+                            @Override
+                            public void run() {
+                                if (!self.isOnline() || step > maxRange) {
+                                    cancel();
+                                    return;
+                                }
+                                Location center = origin.clone().add(dir.clone().multiply(step));
+                                World w = center.getWorld();
+
+                                for (int i = -1; i <= 1; i++) {
+                                    Location bladeLoc = center.clone().add(right.clone().multiply(i * 1.1));
+                                    w.spawnParticle(Particle.SWEEP_ATTACK, bladeLoc, 2, 0.2, 0.2, 0.2, 0);
+                                    w.spawnParticle(Particle.CLOUD, bladeLoc, 4, 0.25, 0.25, 0.25, 0.04);
+                                }
+
+                                for (Entity e : w.getNearbyEntities(center, 2.4, 2.0, 2.4)) {
+                                    if (e instanceof LivingEntity le && le != self && hitEntities.add(le.getUniqueId())) {
+                                        le.setHealth(Math.max(0.0, le.getHealth() - waveDmg));
+                                        le.damage(0.01, self);
+                                        le.setVelocity(dir.clone().multiply(1.3).setY(0.4));
+                                    }
+                                }
+
+                                if (!center.getBlock().isPassable()) {
+                                    cancel();
+                                    return;
+                                }
+                                step++;
+                            }
+                        }.runTaskTimer(plugin, 0L, 1L);
+                    }
+                    case "KY_LAN_BLESSING" -> {
+                        Location c = self.getLocation();
+                        World w = c.getWorld();
+                        double healRatio = 0.45 + level * 0.15;
+
+                        playSoundSafe(self, "item.totem.use", 1.2f);
+                        self.sendActionBar(Component.text("🦄 Kỳ Lân " + toRoman(level) + ": Thánh Quang Giáng Thế!", NamedTextColor.YELLOW, TextDecoration.BOLD));
+
+                        for (double y = 0; y <= 8.0; y += 0.5) {
+                            w.spawnParticle(Particle.END_ROD, c.clone().add(0, y, 0), 6, 0.5, 0.1, 0.5, 0.02);
+                        }
+                        w.spawnParticle(Particle.TOTEM_OF_UNDYING, c.clone().add(0, 1.2, 0), 30, 1.5, 0.8, 1.5, 0.15);
+
+                        for (Entity e : w.getNearbyEntities(c, 5.5, 4.0, 5.5)) {
+                            if (e instanceof Player ally) {
+                                AttributeInstance attr = ally.getAttribute(Attribute.MAX_HEALTH);
+                                double max = attr != null ? attr.getValue() : 20.0;
+                                healPlayer(ally, max * healRatio);
+                                ally.setFoodLevel(20);
+                                ally.setSaturation(20f);
+                                for (PotionEffect ef : new ArrayList<>(ally.getActivePotionEffects())) {
+                                    if (NEGATIVE_EFFECTS.contains(ef.getType())) {
+                                        ally.removePotionEffect(ef.getType());
+                                    }
+                                }
+                            } else if (e instanceof Monster monster) {
+                                monster.setFireTicks(100);
+                                monster.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 80, 4));
+                                monster.damage(4.0 + level * 2.0, self);
+                            }
+                        }
+                    }
                     case "HUYEN_VU_SHELL" -> {
                         int durationSec = 3 + level;
                         double radius = 4.5 + level * 0.5;
@@ -1497,7 +1580,6 @@ public class EnchantManager implements Listener {
                                     return;
                                 }
 
-                                // Vẽ vòng tròn Lãnh Địa 4 nguyên tố xung quanh vùng triển khai
                                 for (int angle = 0; angle < 360; angle += 15) {
                                     double rad = Math.toRadians(angle + ticks * 5);
                                     Location edge = domainCenter.clone().add(Math.cos(rad) * radius, 0.5, Math.sin(rad) * radius);
@@ -1513,22 +1595,18 @@ public class EnchantManager implements Listener {
                                     }
                                 }
 
-                                // Mỗi 1 giây (20 ticks): Tứ Tượng luân phiên oanh tạc kẻ địch trong lãnh địa
                                 if (ticks % 20 == 0 && !enemies.isEmpty()) {
-                                    // 1. Thanh Long giáng sét
                                     LivingEntity boltTarget = enemies.get(ThreadLocalRandom.current().nextInt(enemies.size()));
                                     w.strikeLightningEffect(boltTarget.getLocation());
                                     boltTarget.setHealth(Math.max(0.0, boltTarget.getHealth() - (4.0 + level * 1.5)));
                                     boltTarget.damage(0.01, self);
 
-                                    // 2. Bạch Hổ bão kiếm chém toàn bộ kẻ địch trong vùng
                                     for (LivingEntity le : enemies) {
                                         w.spawnParticle(Particle.SWEEP_ATTACK, le.getLocation().add(0, 1.0, 0), 3, 0.5, 0.3, 0.5, 0);
                                         le.damage(3.0 + level * 1.0, self);
                                         le.setFireTicks(80);
                                     }
 
-                                    // 3. Huyền Vũ hồi máu & giải độc cho chủ nhân
                                     healPlayer(self, 2.0 + level);
                                 }
                                 ticks += 5;
@@ -1626,7 +1704,6 @@ public class EnchantManager implements Listener {
 
                             self.setVelocity(dir.clone().multiply(1.7 + level * 0.15).setY(0.25));
                             playSoundSafe(self, "entity.player.attack.sweep", 1.3f);
-                            self.sendActionBar(Component.text("🐅 Bạch Hổ " + toRoman(level) + ": Cuồng Phong Trảm!", NamedTextColor.WHITE, TextDecoration.BOLD));
 
                             double slashDmg = 4.0 + level * 1.5;
                             new BukkitRunnable() {
