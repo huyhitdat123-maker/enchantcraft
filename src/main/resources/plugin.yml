@@ -4,7 +4,10 @@ main: com.enchantcraft.EnchantCraftPlugin
 api-version: '1.21'
 commands:
   enchantcraft:
-    description: Nhận sách phù phép từ EnchantCraft
+    description: Lenh quan ly cua plugin EnchantCraft
     aliases: [ec]
-    usage: /enchantcraft <ten_enchant>
     permission: enchantcraft.admin
+    usage: /ec <ten_phu_phep|reload>
+  random:
+    description: Mo giao dien quay sach phu phep bang cap XP
+    usage: /random ce
