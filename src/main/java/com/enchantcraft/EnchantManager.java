@@ -21,14 +21,6 @@ import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.Ageable;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.*;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -66,16 +58,20 @@ public class EnchantManager implements Listener {
         final Material icon;
         final int slot;
         final int costLevels;
+        final int salvageLevels;
+        final List<String> salvageItems;
         final boolean broadcast;
         final List<String> lore;
         final List<String> pool;
 
-        RandomTier(String id, String displayName, Material icon, int slot, int costLevels, boolean broadcast, List<String> lore, List<String> pool) {
+        RandomTier(String id, String displayName, Material icon, int slot, int costLevels, int salvageLevels, List<String> salvageItems, boolean broadcast, List<String> lore, List<String> pool) {
             this.id = id;
             this.displayName = displayName;
             this.icon = icon;
             this.slot = slot;
             this.costLevels = costLevels;
+            this.salvageLevels = salvageLevels;
+            this.salvageItems = salvageItems;
             this.broadcast = broadcast;
             this.lore = lore;
             this.pool = pool;
@@ -98,6 +94,7 @@ public class EnchantManager implements Listener {
 
     private final Map<String, CustomEnchant> enchants = new LinkedHashMap<>();
     private final Map<String, RandomTier> randomTiers = new LinkedHashMap<>();
+    private final Map<String, String> enchantToTierId = new HashMap<>();
     private final Map<UUID, Map<String, Long>> cooldowns = new HashMap<>();
     private final Map<UUID, BlockFace> lastClickedFace = new HashMap<>();
     private final Map<UUID, Map<PotionEffectType, Integer>> boostedBuffCaps = new HashMap<>();
@@ -116,6 +113,7 @@ public class EnchantManager implements Listener {
     public void loadEnchants() {
         enchants.clear();
         randomTiers.clear();
+        enchantToTierId.clear();
 
         File file = new File(plugin.getDataFolder(), "enchants.yml");
         if (!file.exists()) {
@@ -160,13 +158,23 @@ public class EnchantManager implements Listener {
                 if (icon == null || icon.isAir()) icon = Material.BOOK;
                 int slot = tSec.getInt("slot", 13);
                 int costLevels = tSec.getInt("cost_levels", 25);
+                int salvageLevels = tSec.getInt("salvage_levels", 5);
+                List<String> salvageItems = tSec.getStringList("salvage_items");
                 boolean broadcast = tSec.getBoolean("broadcast", false);
                 List<String> lore = tSec.getStringList("lore");
                 List<String> pool = tSec.getStringList("pool");
 
-                randomTiers.put(tierId.toLowerCase(), new RandomTier(
-                        tierId.toLowerCase(), name, icon, slot, costLevels, broadcast, lore, pool
+                String lowerTier = tierId.toLowerCase();
+                randomTiers.put(lowerTier, new RandomTier(
+                        lowerTier, name, icon, slot, costLevels, salvageLevels, salvageItems, broadcast, lore, pool
                 ));
+
+                for (String entry : pool) {
+                    String[] parts = entry.split(":");
+                    if (!parts[0].equalsIgnoreCase("TIER")) {
+                        enchantToTierId.put(parts[0].toLowerCase(), lowerTier);
+                    }
+                }
             }
         }
     }
@@ -202,6 +210,8 @@ public class EnchantManager implements Listener {
         lore.add(Component.empty());
         lore.add(Component.text("▶ Cầm sách và Chuột Phải vào trang bị trong túi đồ", NamedTextColor.YELLOW)
                 .decoration(TextDecoration.ITALIC, false));
+        lore.add(Component.text("▶ Hoặc cầm sách gõ /phanra để đổi lấy XP & vật phẩm", NamedTextColor.DARK_AQUA)
+                .decoration(TextDecoration.ITALIC, false));
 
         meta.lore(lore);
         meta.setEnchantmentGlintOverride(true);
@@ -209,6 +219,69 @@ public class EnchantManager implements Listener {
 
         book.setItemMeta(meta);
         return book;
+    }
+
+    // =========================================================================
+    // CƠ CHẾ PHÂN RÃ SÁCH (/phanra)
+    // =========================================================================
+
+    public void salvageHeldBook(Player player) {
+        ItemStack hand = player.getInventory().getItemInMainHand();
+        if (hand.getType() != Material.ENCHANTED_BOOK || !hand.hasItemMeta()) {
+            player.sendMessage(Component.text("Bạn phải cầm Sách Phù Phép (EnchantCraft) trên tay chính để phân rã!", NamedTextColor.RED));
+            playSoundSafe(player, "entity.villager.no", 1.0f);
+            return;
+        }
+
+        String enchantId = hand.getItemMeta().getPersistentDataContainer().get(bookEnchantKey, PersistentDataType.STRING);
+        if (enchantId == null) {
+            player.sendMessage(Component.text("Cuốn sách này không phải sách phù phép của EnchantCraft!", NamedTextColor.RED));
+            playSoundSafe(player, "entity.villager.no", 1.0f);
+            return;
+        }
+
+        CustomEnchant enchant = getEnchant(enchantId);
+        String tierId = enchantToTierId.getOrDefault(enchantId.toLowerCase(), "thuong");
+        RandomTier tier = randomTiers.get(tierId);
+
+        int xpReward = (tier != null) ? tier.salvageLevels : 5;
+        List<String> itemRewards = (tier != null) ? tier.salvageItems : List.of("EMERALD:2");
+
+        // Trừ 1 cuốn sách trên tay
+        if (hand.getAmount() > 1) {
+            hand.setAmount(hand.getAmount() - 1);
+        } else {
+            player.getInventory().setItemInMainHand(null);
+        }
+
+        // Cộng cấp XP
+        if (xpReward > 0) {
+            player.setLevel(player.getLevel() + xpReward);
+        }
+
+        // Trao vật phẩm
+        List<String> rewardSummary = new ArrayList<>();
+        if (xpReward > 0) rewardSummary.add("+" + xpReward + " Cấp XP");
+
+        for (String raw : itemRewards) {
+            String[] parts = raw.split(":");
+            Material mat = Material.matchMaterial(parts[0].toUpperCase());
+            int amount = parts.length > 1 ? parseIntSafe(parts[1], 1) : 1;
+            if (mat != null && !mat.isAir() && amount > 0) {
+                ItemStack drop = new ItemStack(mat, amount);
+                Map<Integer, ItemStack> rem = player.getInventory().addItem(drop);
+                rem.values().forEach(r -> player.getWorld().dropItemNaturally(player.getLocation(), r));
+                rewardSummary.add(amount + "x " + mat.name());
+            }
+        }
+
+        String bookName = (enchant != null) ? enchant.getDisplayName() : enchantId;
+        playSoundSafe(player, "block.grindstone.use", 1.1f);
+        player.getWorld().spawnParticle(Particle.ENCHANT, player.getLocation().add(0, 1.2, 0), 25, 0.4, 0.4, 0.4, 0.2);
+        player.sendMessage(Component.text("♻ Phân rã thành công ", NamedTextColor.GREEN)
+                .append(Component.text(bookName, NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD))
+                .append(Component.text(" → Nhận: ", NamedTextColor.GREEN))
+                .append(Component.text(String.join(", ", rewardSummary), NamedTextColor.GOLD)));
     }
 
     // =========================================================================
@@ -266,6 +339,24 @@ public class EnchantManager implements Listener {
             gui.setItem(tier.slot, item);
         }
 
+        // Nút Lò Phân Rã ở ô số 22 (hàng dưới chính giữa)
+        ItemStack salvageBtn = new ItemStack(Material.GRINDSTONE);
+        ItemMeta sMeta = salvageBtn.getItemMeta();
+        if (sMeta != null) {
+            sMeta.displayName(Component.text("♻ Lò Phân Rã Sách", NamedTextColor.GOLD, TextDecoration.BOLD)
+                    .decoration(TextDecoration.ITALIC, false));
+            sMeta.lore(List.of(
+                    Component.text("Cầm Sách Phù Phép trên tay chính rồi bấm", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+                    Component.text("vào đây (hoặc gõ /phanra) để tái chế sách", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+                    Component.text("thành Cấp XP và Khoáng Sản hiếm!", NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false),
+                    Component.empty(),
+                    Component.text("▶ Bấm để phân rã sách đang cầm!", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false)
+            ));
+            sMeta.getPersistentDataContainer().set(guiTierKey, PersistentDataType.STRING, "SALVAGE_BUTTON");
+            salvageBtn.setItemMeta(sMeta);
+        }
+        gui.setItem(22, salvageBtn);
+
         player.openInventory(gui);
     }
 
@@ -280,6 +371,12 @@ public class EnchantManager implements Listener {
 
         String tierId = clicked.getItemMeta().getPersistentDataContainer().get(guiTierKey, PersistentDataType.STRING);
         if (tierId == null) return;
+
+        if (tierId.equals("SALVAGE_BUTTON")) {
+            player.closeInventory();
+            salvageHeldBook(player);
+            return;
+        }
 
         RandomTier tier = randomTiers.get(tierId);
         if (tier == null) return;
@@ -384,7 +481,6 @@ public class EnchantManager implements Listener {
         if (event.getInventory().getHolder() instanceof RandomGuiHolder) return;
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
-        // 1. Chặn cất vật phẩm có phù phép Liên Kết (SOULBOUND) vào rương/container ngoài
         if (event.getView().getTopInventory().getType() != InventoryType.CRAFTING) {
             ItemStack current = event.getCurrentItem();
             ItemStack cursor = event.getCursor();
@@ -407,7 +503,6 @@ public class EnchantManager implements Listener {
             }
         }
 
-        // 2. Ép sách phù phép bằng chuột phải
         if (!event.isRightClick() || event.getClickedInventory() == null) return;
         ItemStack cursor = event.getCursor();
         ItemStack target = event.getCurrentItem();
@@ -611,7 +706,6 @@ public class EnchantManager implements Listener {
     public void onGeneralDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player victim)) return;
 
-        // 1. Miễn nhiễm sát thương rơi (Khinh Công)
         if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
             for (ItemStack armor : victim.getInventory().getArmorContents()) {
                 if (hasAction(armor, "NO_FALL_DAMAGE")) {
@@ -621,7 +715,6 @@ public class EnchantManager implements Listener {
             }
         }
 
-        // 2. Tái sinh khi nhận sát thương chí mạng (Phượng Hoàng Niết Bàn / Nguyên Phượng)
         if (victim.getHealth() - event.getFinalDamage() <= 0) {
             for (ItemStack armor : victim.getInventory().getArmorContents()) {
                 if (armor == null || armor.getType().isAir() || !armor.hasItemMeta()) continue;
@@ -641,7 +734,6 @@ public class EnchantManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-        // 1. Tấn công cận chiến bằng vũ khí
         if (event.getDamager() instanceof Player attacker && event.getEntity() instanceof LivingEntity target) {
             ItemStack weapon = attacker.getInventory().getItemInMainHand();
             if (!weapon.getType().isAir() && weapon.hasItemMeta()) {
@@ -649,7 +741,6 @@ public class EnchantManager implements Listener {
             }
         }
 
-        // 2. Bắn trúng mục tiêu bằng Cung / Nỏ
         if (event.getDamager() instanceof AbstractArrow arrow && arrow.getShooter() instanceof Player shooter && event.getEntity() instanceof LivingEntity target) {
             String rawIds = arrow.getPersistentDataContainer().get(arrowEnchantsKey, PersistentDataType.STRING);
             if (rawIds != null && !rawIds.isEmpty()) {
@@ -663,7 +754,6 @@ public class EnchantManager implements Listener {
             }
         }
 
-        // 3. Phòng thủ khi mặc giáp
         if (event.getEntity() instanceof Player victim) {
             LivingEntity attacker = null;
             if (event.getDamager() instanceof LivingEntity le) {
@@ -778,7 +868,6 @@ public class EnchantManager implements Listener {
 
         Block origin = event.getBlock();
 
-        // Thần Nông: Thu hoạch và tự gieo hạt lại 3x3
         if (harvest3x3 && origin.getBlockData() instanceof Ageable) {
             event.setCancelled(true);
             miningLock.add(player.getUniqueId());
@@ -830,7 +919,6 @@ public class EnchantManager implements Listener {
                         damageTool(tool);
                     }
 
-                    // Hên xui khi đào quặng
                     if (gambleOre && isOreBlock(bType)) {
                         double r = ThreadLocalRandom.current().nextDouble();
                         drops.clear();
@@ -846,24 +934,20 @@ public class EnchantManager implements Listener {
                         }
                     }
 
-                    // Khối hóa quặng
                     if (blockifyChance > 0 && isOreBlock(bType) && ThreadLocalRandom.current().nextDouble() < blockifyChance) {
                         drops.clear();
                         drops.add(new ItemStack(getOreBlockForm(bType), 1));
                     }
 
-                    // Xui xẻo bốc hơi đồ
                     if (vaporizeChance > 0 && ThreadLocalRandom.current().nextDouble() < vaporizeChance) {
                         drops.clear();
                     }
 
-                    // Thối rữa biến thành Đất
                     if (rotChance > 0 && !drops.isEmpty() && ThreadLocalRandom.current().nextDouble() < rotChance) {
                         drops.clear();
                         drops.add(new ItemStack(Material.DIRT, 1));
                     }
 
-                    // Bàn tay Midas
                     if (midas && !drops.isEmpty()) {
                         double mr = ThreadLocalRandom.current().nextDouble();
                         if (mr < 0.01) {
@@ -875,7 +959,6 @@ public class EnchantManager implements Listener {
                         }
                     }
 
-                    // Kỳ Lân nhân đôi rơi đồ
                     if (doubleDropChance > 0 && !drops.isEmpty() && ThreadLocalRandom.current().nextDouble() < doubleDropChance) {
                         List<ItemStack> doubled = new ArrayList<>();
                         for (ItemStack d : drops) doubled.add(d.clone());
@@ -953,7 +1036,6 @@ public class EnchantManager implements Listener {
                 triggerItemEnchants(item, TriggerType.PASSIVE, player, null, player.getLocation(), 0, null);
             }
 
-            // Cập nhật giới hạn máu Giáp Gaia
             AttributeInstance maxHpAttr = player.getAttribute(Attribute.MAX_HEALTH);
             if (maxHpAttr != null) {
                 AttributeModifier existing = maxHpAttr.getModifier(gaiaHpModifierKey);
@@ -967,7 +1049,6 @@ public class EnchantManager implements Listener {
                 }
             }
 
-            // Huyền Vũ: Giải hiệu ứng bất lợi & +1 cấp hiệu ứng có lợi (khóa trần +1)
             if (hasHuyenVu) {
                 Map<PotionEffectType, Integer> playerCaps = boostedBuffCaps.computeIfAbsent(player.getUniqueId(), k -> new HashMap<>());
                 for (PotionEffect effect : new ArrayList<>(player.getActivePotionEffects())) {
@@ -1327,6 +1408,48 @@ public class EnchantManager implements Listener {
                                 ticks += 5;
                             }
                         }.runTaskTimer(plugin, 0L, 5L);
+                    }
+                    case "SWORD_BARRAGE" -> {
+                        int count = Integer.parseInt(parts[1]);
+                        double dmg = parts.length > 2 ? Double.parseDouble(parts[2]) : 6.0;
+                        playSoundSafe(self, "entity.illusioner.cast_spell", 1.4f);
+
+                        new BukkitRunnable() {
+                            int fired = 0;
+                            @Override
+                            public void run() {
+                                if (!self.isOnline() || fired >= count) {
+                                    cancel();
+                                    return;
+                                }
+                                Vector dir = self.getEyeLocation().getDirection().normalize();
+                                Vector right = new Vector(-dir.getZ(), 0, dir.getX()).normalize();
+                                Location eye = self.getEyeLocation();
+
+                                for (int b = 0; b < 3 && fired < count; b++) {
+                                    double sideOffset = ThreadLocalRandom.current().nextDouble(-1.4, 1.4);
+                                    double heightOffset = ThreadLocalRandom.current().nextDouble(-0.3, 0.9);
+                                    Location spawnLoc = eye.clone()
+                                            .add(right.clone().multiply(sideOffset))
+                                            .add(0, heightOffset, 0)
+                                            .add(dir.clone().multiply(0.8));
+
+                                    Arrow swordProj = self.getWorld().spawnArrow(spawnLoc, dir, 3.2f, 1.5f);
+                                    swordProj.setShooter(self);
+                                    swordProj.setDamage(dmg);
+                                    swordProj.setPierceLevel(2);
+                                    swordProj.setCritical(true);
+                                    swordProj.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
+
+                                    spawnLoc.getWorld().spawnParticle(Particle.SWEEP_ATTACK, spawnLoc, 1, 0, 0, 0, 0);
+                                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                        if (swordProj.isValid()) swordProj.remove();
+                                    }, 50L);
+                                    fired++;
+                                }
+                                playSoundSafe(self, "entity.player.attack.sweep", 1.5f);
+                            }
+                        }.runTaskTimer(plugin, 0L, 2L);
                     }
                     case "ARROW_RAIN" -> {
                         int count = Integer.parseInt(parts[1]);
