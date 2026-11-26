@@ -11,3 +11,7 @@ commands:
   random:
     description: Mo giao dien quay sach phu phep bang cap XP
     usage: /random ce
+  phanra:
+    description: Phan ra sach phu phep dang cam tren tay thanh XP va vat pham
+    aliases: [disenchant, pr]
+    usage: /phanra
